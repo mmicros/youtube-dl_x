@@ -6,8 +6,13 @@ from bs4 import BeautifulSoup as bs
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTreeWidgetItem
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QObject, SIGNAL
+from PySide6.QtCore import QObject, SIGNAL, Signal, Slot, QProcess, QByteArray
 from ui_mainwindow import Ui_main
+
+@Slot(str)
+def updateProgress(message):
+    window.ui._lbUpdate.setText(message)
+
 
 def selectBookmark():
     filename = QFileDialog.getOpenFileName(window, "Select Bookmark", "", "(*.html)")
@@ -27,25 +32,31 @@ def selectBookmark():
                     #print(tag['href'] + " || " + tag.string)
                     
                 tag = tag.next_element
+
+
             
 def download():
-    url = window.ui._urls.topLevelItem(0).text(0)
-    process = subprocess.Popen(['youtube-dl', '-x', '--no-playlist', '-o', 'songs/%(title)s.%(ext)s', str(url)], 
-                           stdout=subprocess.PIPE,
-                           universal_newlines=True)
-    
-    while True:
-        output = process.stdout.readline()
-        # print(output.strip())
-        window.ui._lbProgress.setText(output)
-        # Do something else
-        return_code = process.poll()
-        if return_code is not None:
-            print('RETURN CODE', return_code)
-            # Process has finished, read rest of the output 
-            for output in process.stdout.readlines():
-                print(output.strip())
-            break
+    def updateProg():
+        message = proc.readAllStandardOutput().data().decode() 
+        print(message)
+        window.ui._lbUpdate.setText(message.strip())
+        
+        try:
+            idx = message.index('%')
+            pcnt = round(float(message[12:idx]))
+            print(f"percentage:{round(float(pcnt))}")
+            window.ui._prBar.setValue(pcnt)
+        except (IndexError,ValueError):
+            pass
+
+    url = window.ui._urls.topLevelItem(0).text(0)    
+
+    program = 'youtube-dl'
+    args = ['-x', '--no-playlist', '-o', 'songs/%(title)s.%(ext)s', str(url)]
+    proc = QProcess(window)
+    proc.readyReadStandardOutput.connect(updateProg)
+    proc.start(program,args)
+
 
 class Window(QMainWindow):
     def __init__(self):
@@ -54,7 +65,7 @@ class Window(QMainWindow):
         self.ui.setupUi(self)
     
         QObject.connect(self.ui._btnChooseFile, SIGNAL('clicked()'), selectBookmark )
-        QObject.connect(self.ui._btnChooseFile, SIGNAL('clicked()'), download )
+        QObject.connect(self.ui._btnDownload, SIGNAL('clicked()'), download )
         
 
         self.show()

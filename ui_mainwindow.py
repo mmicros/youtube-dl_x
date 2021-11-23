@@ -16,14 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFrame,
-    QGridLayout, QHeaderView, QLabel, QMainWindow,
-    QProgressBar, QPushButton, QSizePolicy, QSpacerItem,
-    QStatusBar, QTreeWidget, QTreeWidgetItem, QWidget)
+    QGridLayout, QHBoxLayout, QHeaderView, QLabel,
+    QMainWindow, QProgressBar, QPushButton, QSizePolicy,
+    QSpacerItem, QStatusBar, QTreeWidget, QTreeWidgetItem,
+    QWidget)
 
 class Ui_main(object):
     def setupUi(self, main):
         if not main.objectName():
             main.setObjectName(u"main")
+        main.resize(1022, 662)
         self.centralwidget = QWidget(main)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
@@ -45,22 +47,11 @@ class Ui_main(object):
 
         self.gridLayout.addWidget(self._urls, 0, 1, 1, 1)
 
-        self.progressBar = QProgressBar(self.centralwidget)
-        self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(24)
-
-        self.gridLayout.addWidget(self.progressBar, 1, 1, 1, 1)
-
-        self.label = QLabel(self.centralwidget)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout.addWidget(self.label, 2, 1, 1, 1)
-
         self.widget = QWidget(self.centralwidget)
         self.widget.setObjectName(u"widget")
         self.gridLayout_2 = QGridLayout(self.widget)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.gridLayout_2.setContentsMargins(-1, 0, -1, -1)
+        self.gridLayout_2.setContentsMargins(-1, 0, -1, 0)
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.gridLayout_2.addItem(self.verticalSpacer, 1, 0, 1, 1)
@@ -76,7 +67,29 @@ class Ui_main(object):
         self.gridLayout_2.addWidget(self._btnDownload, 2, 0, 1, 1)
 
 
-        self.gridLayout.addWidget(self.widget, 0, 0, 3, 1)
+        self.gridLayout.addWidget(self.widget, 0, 0, 4, 1)
+
+        self._prBar = QProgressBar(self.centralwidget)
+        self._prBar.setObjectName(u"_prBar")
+        self._prBar.setValue(0)
+
+        self.gridLayout.addWidget(self._prBar, 1, 1, 1, 1)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self._lbProg = QLabel(self.centralwidget)
+        self._lbProg.setObjectName(u"_lbProg")
+
+        self.horizontalLayout.addWidget(self._lbProg)
+
+        self._lbUpdate = QLabel(self.centralwidget)
+        self._lbUpdate.setObjectName(u"_lbUpdate")
+
+        self.horizontalLayout.addWidget(self._lbUpdate)
+
+        self.horizontalLayout.setStretch(1, 1)
+
+        self.gridLayout.addLayout(self.horizontalLayout, 2, 1, 1, 1)
 
         main.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(main)
@@ -92,8 +105,9 @@ class Ui_main(object):
         main.setWindowTitle(QCoreApplication.translate("main", u"Youtube-dl Audio Downloader", None))
         ___qtreewidgetitem = self._urls.headerItem()
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("main", u"Title/Artist", None));
-        self.label.setText(QCoreApplication.translate("main", u"Progress: ", None))
         self._btnChooseFile.setText(QCoreApplication.translate("main", u"Import Bookmark File", None))
         self._btnDownload.setText(QCoreApplication.translate("main", u"Download", None))
+        self._lbProg.setText(QCoreApplication.translate("main", u"Progress: ", None))
+        self._lbUpdate.setText("")
     # retranslateUi
 
